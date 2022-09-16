@@ -634,8 +634,8 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         beQuiet = i < numTraining
         if beQuiet:
                 # Suppress output and graphics
-                from project_1.support import textDisplay
-                gameDisplay = textDisplay.NullGraphics()
+            from project_1.support import textDisplay
+            gameDisplay = textDisplay.NullGraphics()
             rules.quiet = True
         else:
             gameDisplay = display
