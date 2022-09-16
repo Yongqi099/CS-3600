@@ -13,8 +13,8 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from project_1.look.util import manhattanDistance
-from project_1.look.game import Grid
+from util import manhattanDistance
+from game import Grid
 import os
 import random
 from functools import reduce
@@ -44,7 +44,7 @@ class Layout:
     def initializeVisibilityMatrix(self):
         global VISIBILITY_MATRIX_CACHE
         if reduce(str.__add__, self.layoutText) not in VISIBILITY_MATRIX_CACHE:
-            from project_1.look.game import Directions
+            from game import Directions
             vecs = [(-0.5,0), (0.5,0),(0,-0.5),(0,0.5)]
             dirs = [Directions.NORTH, Directions.SOUTH, Directions.WEST, Directions.EAST]
             vis = Grid(self.width, self.height, {Directions.NORTH:set(), Directions.SOUTH:set(), Directions.EAST:set(), Directions.WEST:set(), Directions.STOP:set()})
@@ -137,8 +137,8 @@ def getLayout(name, back = 2):
         layout = tryToLoad('layouts/' + name + '.lay')
         if layout == None: layout = tryToLoad(name + '.lay')
     if layout == None and back >= 0:
-        curdir = os.path.abspath('../..')
-        os.chdir('../../..')
+        curdir = os.path.abspath('.')
+        os.chdir('..')
         layout = getLayout(name, back -1)
         os.chdir(curdir)
     return layout

@@ -46,8 +46,8 @@ from game import Directions
 from game import Actions
 from util import nearestPoint
 from util import manhattanDistance
-from project_1.support import layout, graphicsDisplay
-import sys, random, os
+import util, layout
+import sys, types, time, random, os
 
 ###################################################
 # YOUR INTERFACE TO THE PACMAN WORLD: A GameState #
@@ -534,7 +534,7 @@ def readCommand( argv ):
     if options.fixRandomSeed: random.seed('cs188')
 
     # Choose a layout
-    args['layout'] = layout.getLayout(options.layout)
+    args['layout'] = layout.getLayout( options.layout )
     if args['layout'] == None: raise Exception("The layout " + options.layout + " cannot be found")
 
     # Choose a Pacman agent
@@ -558,13 +558,14 @@ def readCommand( argv ):
 
     # Choose a display format
     if options.quietGraphics:
-        from project_1.support import textDisplay
+        import textDisplay
         args['display'] = textDisplay.NullGraphics()
     elif options.textGraphics:
-        from project_1.support import textDisplay
+        import textDisplay
         textDisplay.SLEEP_TIME = options.frameTime
         args['display'] = textDisplay.PacmanGraphics()
     else:
+        import graphicsDisplay
         args['display'] = graphicsDisplay.PacmanGraphics(options.zoom, frameTime = options.frameTime)
     args['numGames'] = options.numGames
     args['record'] = options.record
@@ -605,10 +606,9 @@ def loadAgent(pacman, nographics):
     raise Exception('The agent ' + pacman + ' is not specified in any *Agents.py.')
 
 def replayGame( layout, actions, display ):
-    from project_1.support import ghostAgents
-    from project_1.support import pacmanAgents
+    import pacmanAgents, ghostAgents
     rules = ClassicGameRules()
-    agents = [pacmanAgents.GreedyAgent()] + [ghostAgents.RandomGhost(i + 1) for i in range(layout.getNumGhosts())]
+    agents = [pacmanAgents.GreedyAgent()] + [ghostAgents.RandomGhost(i+1) for i in range(layout.getNumGhosts())]
     game = rules.newGame( layout, agents[0], agents[1:], display )
     state = game.state
     display.initialize(state.data)
@@ -634,7 +634,7 @@ def runGames( layout, pacman, ghosts, display, numGames, record, numTraining = 0
         beQuiet = i < numTraining
         if beQuiet:
                 # Suppress output and graphics
-            from project_1.support import textDisplay
+            import textDisplay
             gameDisplay = textDisplay.NullGraphics()
             rules.quiet = True
         else:

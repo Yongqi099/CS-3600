@@ -12,7 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from project_1.edit import search
+import search
 import random
 
 # Module Classes

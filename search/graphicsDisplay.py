@@ -15,7 +15,7 @@
 
 from graphicsUtils import *
 import math, time
-from project_1.look.game import Directions
+from game import Directions
 
 ###########################
 #  GRAPHICS DISPLAY CODE  #

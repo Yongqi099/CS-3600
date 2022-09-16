@@ -35,10 +35,10 @@ project description for details.
 
 Good luck and happy searching!
 """
-from project_1.look.game import Directions
-from project_1.look.game import Agent
-from project_1.look.game import Actions
-from project_1.look import util
+from game import Directions
+from game import Agent
+from game import Actions
+import util
 import time
 import search
 

@@ -15,12 +15,14 @@
 
 "Common code for autograders"
 
+import cgi
 import time
+import sys
 import json
 import traceback
+import pdb
 from collections import defaultdict
-from project_1.look import util
-
+import util
 
 class Grades:
   "A data structure for project grades, along with formatting code to display them"
@@ -73,7 +75,7 @@ class Grades:
 
       if self.mute: util.mutePrint()
       try:
-        util.TimeoutFunction(getattr(gradingModule, q), 300)(self) # Call the question's function
+        util.TimeoutFunction(getattr(gradingModule, q),300)(self) # Call the question's function
         #TimeoutFunction(getattr(gradingModule, q),1200)(self) # Call the question's function
       except Exception as inst:
         self.addExceptionMessage(q, inst, traceback)

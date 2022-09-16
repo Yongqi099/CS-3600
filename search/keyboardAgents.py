@@ -13,8 +13,8 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from project_1.look.game import Agent
-from project_1.look.game import Directions
+from game import Agent
+from game import Directions
 import random
 
 class KeyboardAgent(Agent):

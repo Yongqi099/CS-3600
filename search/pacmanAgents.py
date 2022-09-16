@@ -13,11 +13,11 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from project_1.look.pacman import Directions
-from project_1.look.game import Agent
+from pacman import Directions
+from game import Agent
 import random
-from project_1.look import util, game
-
+import game
+import util
 
 class LeftTurnAgent(game.Agent):
     "An agent that turns left at every opportunity"
