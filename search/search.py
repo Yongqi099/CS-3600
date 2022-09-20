@@ -85,21 +85,65 @@ def depthFirstSearch(problem):
 
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
-
+    """
+    """
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
+    "*** YOUR CODE HERE ***"
+    openList = util.Stack()
+    closedList = set()
+    path = []
+    current = problem.getStartState()
+
+    while not problem.isGoalState(current):
+
+        if current not in closedList:
+
+            closedList.add(current)
+            successors = problem.getSuccessors(current)
+
+            for successor in successors:
+                openList.push(((successor[0]), path + [successor[1]]))
+
+        p = openList.pop()
+        current = p[0]
+        path = p[1]
+    return path
+
+    # util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """
     Search the shallowest nodes in the search tree first.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    openList = util.Queue()
+    closedList = set()
+    path = []
+    current = problem.getStartState()
+
+    while not problem.isGoalState(current):
+
+        if current not in closedList:
+
+            closedList.add(current)
+            successors = problem.getSuccessors(current)
+
+            for successor in successors:
+                openList.push((
+                        (successor[0]),
+                        path + [successor[1]]
+                    ))
+
+        p = openList.pop()
+        print(p)
+        current = p[0]
+        path = p[1]
+    return path
+    # util.raiseNotDefined()
 
 
 def uniformCostSearch(problem):
@@ -107,7 +151,33 @@ def uniformCostSearch(problem):
     Search the node of least total cost first.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    openList = util.PriorityQueue()
+    visited = set()
+    path = [[], 0]
+    state = problem.getStartState()
+
+    while not problem.isGoalState(state):
+
+        if state not in visited:
+
+            visited.add(state)
+            successors = problem.getSuccessors(state)
+
+            for successor in successors:
+                cost = path[1] + successor[2]
+
+                openList.push((
+                        (successor[0]),
+                        (path[0] + [successor[1]]),
+                        cost),
+                    cost)
+
+        p = openList.pop()
+        state = p[0]
+        path[0] = p[1]
+        path[1] = p[2]
+    return path[0]
+    # util.raiseNotDefined()
 
 
 def nullHeuristic(state, problem=None):
