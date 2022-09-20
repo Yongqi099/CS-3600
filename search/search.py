@@ -95,23 +95,23 @@ def depthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     openList = util.Stack()
     closedList = set()
-    path = []
-    current = problem.getStartState()
+    current = [problem.getStartState(), []]
 
-    while not problem.isGoalState(current):
+    while not problem.isGoalState(current[0]):
 
-        if current not in closedList:
+        cur = current[0]
+        if cur not in closedList:
 
-            closedList.add(current)
-            successors = problem.getSuccessors(current)
+            closedList.add(cur)
+            successors = problem.getSuccessors(cur)
 
             for successor in successors:
-                openList.push(((successor[0]), path + [successor[1]]))
+                openList.push(((successor[0]), current[1] + [successor[1]]))
 
         p = openList.pop()
-        current = p[0]
-        path = p[1]
-    return path
+        current[0] = p[0]
+        current[1] = p[1]
+    return current[1]
 
     # util.raiseNotDefined()
 
@@ -122,27 +122,23 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     openList = util.Queue()
     closedList = set()
-    path = []
-    current = problem.getStartState()
+    current = [problem.getStartState(), []]
 
-    while not problem.isGoalState(current):
+    while not problem.isGoalState(current[0]):
 
-        if current not in closedList:
+        cur = current[0]
+        if cur not in closedList:
 
-            closedList.add(current)
-            successors = problem.getSuccessors(current)
+            closedList.add(cur)
+            successors = problem.getSuccessors(cur)
 
             for successor in successors:
-                openList.push((
-                        (successor[0]),
-                        path + [successor[1]]
-                    ))
+                openList.push(((successor[0]), current[1] + [successor[1]]))
 
         p = openList.pop()
-        print(p)
-        current = p[0]
-        path = p[1]
-    return path
+        current[0] = p[0]
+        current[1] = p[1]
+    return current[1]
     # util.raiseNotDefined()
 
 
@@ -153,32 +149,30 @@ def uniformCostSearch(problem):
     "*** YOUR CODE HERE ***"
     openList = util.PriorityQueue()
     closedList = set()
-    state = problem.getStartState()
-    path = []
-    cost = 0
-    # optimize by combining state, path, cost into one
+    current = [problem.getStartState(), [], 0]
 
-    while not problem.isGoalState(state):
+    while not problem.isGoalState(current[0]):
 
-        if state not in closedList:
+        cur0 = current[0]
+        if cur0 not in closedList:
 
-            closedList.add(state)
-            successors = problem.getSuccessors(state)
+            closedList.add(cur0)
+            successors = problem.getSuccessors(cur0)
 
             for successor in successors:
-                c = cost + successor[2]
+                c = current[2] + successor[2]
 
                 openList.push((
                         (successor[0]),
-                        (path + [successor[1]]),
+                        (current[1] + [successor[1]]),
                         c),
                     c)
 
         p = openList.pop()
-        state = p[0]
-        path = p[1]
-        cost = p[2]
-    return path
+        for i in range(len(current)):
+            current[i] = p[i]
+
+    return current[1]
     # util.raiseNotDefined()
 
 
@@ -197,35 +191,33 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     openList = util.PriorityQueue()
     closedList = set()
-    state = problem.getStartState()
-    path = []
-    cost = 0
+    current = [problem.getStartState(), [], 0]
 
-    while not problem.isGoalState(state):
+    while not problem.isGoalState(current[0]):
 
-        if state not in closedList:
+        cur0 = current[0]
+        if cur0 not in closedList:
 
-            closedList.add(state)
-            successors = problem.getSuccessors(state)
+            closedList.add(cur0)
+            successors = problem.getSuccessors(cur0)
 
             for successor in successors:
                 h = heuristic(successor[0], problem)
-                c = cost + successor[2]
+                c = current[2] + successor[2]
                 c2 = c + h
 
                 openList.push((
                         (successor[0]),
-                        (path + [successor[1]]),
+                        (current[1] + [successor[1]]),
                         c),
                     c2)
 
         p = openList.pop()
-        state = p[0]
-        path = p[1]
-        cost = p[2]
-    return path
-    util.raiseNotDefined()
+        for i in range(len(current)):
+            current[i] = p[i]
 
+    return current[1]
+    # util.raiseNotDefined()
 
 # Abbreviations
 bfs = breadthFirstSearch
