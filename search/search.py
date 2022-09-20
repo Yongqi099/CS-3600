@@ -152,31 +152,32 @@ def uniformCostSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     openList = util.PriorityQueue()
-    visited = set()
-    path = [[], 0]
+    closedList = set()
     state = problem.getStartState()
+    path = []
+    cost = 0
 
     while not problem.isGoalState(state):
 
-        if state not in visited:
+        if state not in closedList:
 
-            visited.add(state)
+            closedList.add(state)
             successors = problem.getSuccessors(state)
 
             for successor in successors:
-                cost = path[1] + successor[2]
+                c = cost + successor[2]
 
                 openList.push((
                         (successor[0]),
-                        (path[0] + [successor[1]]),
-                        cost),
-                    cost)
+                        (path + [successor[1]]),
+                        c),
+                    c)
 
         p = openList.pop()
         state = p[0]
-        path[0] = p[1]
-        path[1] = p[2]
-    return path[0]
+        path = p[1]
+        cost = p[2]
+    return path
     # util.raiseNotDefined()
 
 
