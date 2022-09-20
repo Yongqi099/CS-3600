@@ -156,6 +156,7 @@ def uniformCostSearch(problem):
     state = problem.getStartState()
     path = []
     cost = 0
+    # optimize by combining state, path, cost into one
 
     while not problem.isGoalState(state):
 
@@ -194,6 +195,35 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     Search the node that has the lowest combined cost and heuristic first.
     """
     "*** YOUR CODE HERE ***"
+    openList = util.PriorityQueue()
+    closedList = set()
+    state = problem.getStartState()
+    path = []
+    cost = 0
+
+    while not problem.isGoalState(state):
+
+        if state not in closedList:
+
+            closedList.add(state)
+            successors = problem.getSuccessors(state)
+
+            for successor in successors:
+                h = heuristic(successor[0], problem)
+                c = cost + successor[2]
+                c2 = c + h
+
+                openList.push((
+                        (successor[0]),
+                        (path + [successor[1]]),
+                        c),
+                    c2)
+
+        p = openList.pop()
+        state = p[0]
+        path = p[1]
+        cost = p[2]
+    return path
     util.raiseNotDefined()
 
 
