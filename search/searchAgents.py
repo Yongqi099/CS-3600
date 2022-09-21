@@ -312,16 +312,19 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
 
+    #TODO
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startingPosition, ()
 
+    #TODO
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return tuple(sorted(state[1])) == self.corners
 
+    #TODO
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
@@ -344,6 +347,19 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = state[0]
+            corners = state[1]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            nextXY = (nextx, nexty)
+            hitsWall = self.walls[nextx][nexty]
+
+            if not hitsWall:
+                if nextXY in self.corners and nextXY not in corners:
+                    sucState = (nextXY, corners + (nextXY,))
+                else:
+                    sucState = (nextXY, corners)
+                successors.append((sucState, action, 1))
 
         self._expanded += 1
         return successors
@@ -390,7 +406,21 @@ def cornersHeuristic(state, problem):
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    pos = state[0]
+    closedList = state[1]
+    h = 0
+
+    while len(corners) > len(closedList):
+        hMove = (None, 999999)
+        for corner in corners:
+            if corner not in closedList:
+                mDis = util.manhattanDistance(pos, corner)
+                hMove = (corner, mDis) if h < hMove[1] else hMove
+        pos = hMove[0]
+        h += hMove[1]
+        closedList += (pos,)
+
+    return h  # Default to trivial solution
 
 
 class AStarCornersAgent(SearchAgent):

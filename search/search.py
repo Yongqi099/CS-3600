@@ -149,6 +149,7 @@ def uniformCostSearch(problem):
     "*** YOUR CODE HERE ***"
     openList = util.PriorityQueue()
     closedList = set()
+    # (int, int), "String", int
     current = [problem.getStartState(), [], 0]
 
     while not problem.isGoalState(current[0]):
@@ -191,6 +192,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     openList = util.PriorityQueue()
     closedList = set()
+    # (int, int), "String", int
     current = [problem.getStartState(), [], 0]
 
     while not problem.isGoalState(current[0]):
