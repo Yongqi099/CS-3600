@@ -311,20 +311,21 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.visitedCorners = ()
 
-    #TODO
+    # TODO
     def getStartState(self):
-        "Returns the start state (in your state space, not the full Pacman state space)"
+        """Returns the start state (in your state space, not the full Pacman state space)"""
         "*** YOUR CODE HERE ***"
-        return self.startingPosition, ()
+        return self.startingPosition, self.visitedCorners
 
-    #TODO
+    # TODO
     def isGoalState(self, state):
-        "Returns whether this search state is a goal state of the problem"
+        """Returns whether this search state is a goal state of the problem"""
         "*** YOUR CODE HERE ***"
         return tuple(sorted(state[1])) == self.corners
 
-    #TODO
+    # TODO
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
@@ -410,7 +411,7 @@ def cornersHeuristic(state, problem):
     closedList = state[1]
     h = 0
 
-    while len(corners) > len(closedList):
+    while len(closedList) < 4:
         hMove = (None, 999999)
         for corner in corners:
             if corner not in closedList:
@@ -587,7 +588,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
     """
 
     def __init__(self, gameState):
-        "Stores information from the gameState.  You don't need to change this."
+        """Stores information from the gameState.  You don't need to change this."""
         # Store the food for later reference
         self.food = gameState.getFood()
 
