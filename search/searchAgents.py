@@ -413,11 +413,12 @@ def cornersHeuristic(state, problem):
     current = [state[0], state[1], 0]
 
     while len(current[1]) < 4:
-        hMove = (None, 999999)
+        hMove = ((0, 0), 999999)
         for corner in corners:
             mDis = getManDis(current[0], corner)
             if corner not in current[1] and mDis < hMove[1]:
                 hMove = (corner, mDis)
+
         current[0] = hMove[0]
         current[1] += (current[0],)
         current[2] += hMove[1]
@@ -554,19 +555,12 @@ def foodHeuristic(state, problem):
 
     for f1 in fList:
         for f2 in fList:
-            mDis = getManDis(f1, f2)
-            # print(str(fLoc1) + "        " + str(fLoc2) + "      mD: " + str(mDis) + "      " + str(current[2]) + "      g: " + str(mDis > current[2]))
-            # if true distance larger than current estimate
-            if mDis > current[2]:
-                current[0] = f1
-                current[1] = f2
-                current[2] = mDis
+            if getManDis(f1, f2) > current[2]:
+                current = [f1, f2, getManDis(f1, f2)]
+
     minF = min(getManDis(position, current[0]),
                getManDis(position, current[1]))
     h = minF + current[2]
-
-    # print("Pac: " + str(position) + "    f: " + str(minF) + "     g: " + str(current[2]) + "    h: " + str(min(disToDotx, disToDoty) + current[2]))
-    # print()
     return h
 
 
@@ -643,20 +637,14 @@ class AnyFoodSearchProblem(PositionSearchProblem):
 
         "*** YOUR CODE HERE ***"
         fList = self.food.asList()
+        currentMin = [fList[0], getManDis(state, fList[0])]
+        if len(fList) != 0:
+            for f in fList:
+                mDis = getManDis(state, f)
+                if mDis < currentMin[1]:
+                    currentMin = [f, mDis]
 
-        if len(fList) == 0:
-            return 0
-
-        minF = fList[0]
-        minD = getManDis(state, minF)
-
-        for f in fList:
-            mDis = getManDis(state, f)
-            if mDis < minD:
-                minD = mDis
-                minF = f
-
-        return state == minF
+        return state == currentMin[0]
 
 
 ##################
