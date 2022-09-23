@@ -43,6 +43,9 @@ import time
 import search
 
 
+def getManDis(xy1, xy2):
+    return util.manhattanDistance(xy1, xy2)
+
 class GoWestAgent(Agent):
     """
     An agent that goes West until it can't.
@@ -316,19 +319,16 @@ class CornersProblem(search.SearchProblem):
         "*** YOUR CODE HERE ***"
         self.visitedCorners = ()
 
-    # TODO
     def getStartState(self):
         """Returns the start state (in your state space, not the full Pacman state space)"""
         "*** YOUR CODE HERE ***"
         return self.startingPosition, self.visitedCorners
 
-    # TODO
     def isGoalState(self, state):
         """Returns whether this search state is a goal state of the problem"""
         "*** YOUR CODE HERE ***"
         return tuple(sorted(state[1])) == self.corners
 
-    # TODO
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
@@ -415,7 +415,7 @@ def cornersHeuristic(state, problem):
     while len(current[1]) < 4:
         hMove = (None, 999999)
         for corner in corners:
-            mDis = util.manhattanDistance(current[0], corner)
+            mDis = getManDis(current[0], corner)
             if corner not in current[1] and mDis < hMove[1]:
                 hMove = (corner, mDis)
         current[0] = hMove[0]
@@ -554,15 +554,15 @@ def foodHeuristic(state, problem):
 
     for f1 in fList:
         for f2 in fList:
-            mDis = util.manhattanDistance(f1, f2)
+            mDis = getManDis(f1, f2)
             # print(str(fLoc1) + "        " + str(fLoc2) + "      mD: " + str(mDis) + "      " + str(current[2]) + "      g: " + str(mDis > current[2]))
             # if true distance larger than current estimate
             if mDis > current[2]:
                 current[0] = f1
                 current[1] = f2
                 current[2] = mDis
-    minF = min(util.manhattanDistance(position, current[0]),
-               util.manhattanDistance(position, current[1]))
+    minF = min(getManDis(position, current[0]),
+               getManDis(position, current[1]))
     h = minF + current[2]
 
     # print("Pac: " + str(position) + "    f: " + str(minF) + "     g: " + str(current[2]) + "    h: " + str(min(disToDotx, disToDoty) + current[2]))
@@ -647,16 +647,16 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         if len(fList) == 0:
             return 0
 
-        closestDot = fList[0]
-        shortestDis = util.manhattanDistance(state, fList[0])
+        minF = fList[0]
+        minD = getManDis(state, minF)
 
-        for dot in fList:
-            dis = util.manhattanDistance(state, dot)
-            if dis < shortestDis:
-                shortestDis = dis
-                closestDot = dot
+        for f in fList:
+            mDis = getManDis(state, f)
+            if mDis < minD:
+                minD = mDis
+                minF = f
 
-        return state == closestDot
+        return state == minF
 
 
 ##################
