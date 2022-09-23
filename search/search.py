@@ -21,6 +21,12 @@ by Pacman agents (in searchAgents.py).
 import util
 
 
+def popToCur(openList, cur):
+    p = openList.pop()
+    for i in range(len(cur)):
+        cur[i] = p[i]
+
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -98,22 +104,20 @@ def depthFirstSearch(problem):
     current = [problem.getStartState(), []]
 
     while not problem.isGoalState(current[0]):
-
         cur = current[0]
-        if cur not in closedList:
 
+        if cur not in closedList:
             closedList.add(cur)
             successors = problem.getSuccessors(cur)
 
             for successor in successors:
                 openList.push(((successor[0]), current[1] + [successor[1]]))
 
-        p = openList.pop()
-        current[0] = p[0]
-        current[1] = p[1]
+        popToCur(openList, current)
     return current[1]
 
     # util.raiseNotDefined()
+
 
 def breadthFirstSearch(problem):
     """
@@ -128,18 +132,14 @@ def breadthFirstSearch(problem):
 
         cur = current[0]
         if cur not in closedList:
-
             closedList.add(cur)
             successors = problem.getSuccessors(cur)
 
             for successor in successors:
                 openList.push(((successor[0]), current[1] + [successor[1]]))
 
-        p = openList.pop()
-        current[0] = p[0]
-        current[1] = p[1]
+        popToCur(openList, current)
     return current[1]
-    # util.raiseNotDefined()
 
 
 def uniformCostSearch(problem):
@@ -153,28 +153,21 @@ def uniformCostSearch(problem):
     current = [problem.getStartState(), [], 0]
 
     while not problem.isGoalState(current[0]):
-
         cur0 = current[0]
-        if cur0 not in closedList:
 
+        if cur0 not in closedList:
             closedList.add(cur0)
             successors = problem.getSuccessors(cur0)
 
             for successor in successors:
                 c = current[2] + successor[2]
-
                 openList.push((
-                        (successor[0]),
-                        (current[1] + [successor[1]]),
-                        c),
+                    (successor[0]),
+                    (current[1] + [successor[1]]),
+                    c),
                     c)
-
-        p = openList.pop()
-        for i in range(len(current)):
-            current[i] = p[i]
-
+        popToCur(openList, current)
     return current[1]
-    # util.raiseNotDefined()
 
 
 def nullHeuristic(state, problem=None):
@@ -196,30 +189,25 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     current = [problem.getStartState(), [], 0]
 
     while not problem.isGoalState(current[0]):
-
         cur0 = current[0]
-        if cur0 not in closedList:
 
+        if cur0 not in closedList:
             closedList.add(cur0)
             successors = problem.getSuccessors(cur0)
 
             for successor in successors:
                 h = heuristic(successor[0], problem)
-                c = current[2] + successor[2]
-                c2 = c + h
+                g = current[2] + successor[2]
+                c = g + h
 
                 openList.push((
-                        (successor[0]),
-                        (current[1] + [successor[1]]),
-                        c),
-                    c2)
-
-        p = openList.pop()
-        for i in range(len(current)):
-            current[i] = p[i]
-
+                    (successor[0]),
+                    (current[1] + [successor[1]]),
+                    g),
+                c)
+        popToCur(openList, current)
     return current[1]
-    # util.raiseNotDefined()
+
 
 # Abbreviations
 bfs = breadthFirstSearch

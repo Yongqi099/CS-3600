@@ -414,14 +414,14 @@ def cornersHeuristic(state, problem):
     current = [state[0], state[1], 0]
 
     while len(current[1]) < 4:
-        hMove = ((0, 0), 999999)
+        closeCorner = (corners[0], 999999)
         for corner in corners:
             mDis = getManDis(current[0], corner)
-            hMove = (corner, mDis) if corner not in current[1] and mDis < hMove[1] else hMove
+            closeCorner = (corner, mDis) if corner not in current[1] and mDis < closeCorner[1] else closeCorner
 
-        current[0] = hMove[0]
+        current[0] = closeCorner[0]
         current[1] += (current[0],)
-        current[2] += hMove[1]
+        current[2] += closeCorner[1]
 
     return current[2]
 
@@ -549,7 +549,7 @@ def foodHeuristic(state, problem):
     h = 0
     fList = foodGrid.asList()
     if len(fList) != 0:
-        # (x1, y1), (x2, y2), heuristic
+        # (x1, y1), (x2, y2), furthest guesstimate
         current = [fList[0], fList[0], 0]
 
         for f1 in fList:
@@ -640,8 +640,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
 
         if len(fList) != 0:
             for f in fList:
-                mDis = getManDis(state, f)
-                currentMin = [f, mDis] if mDis < currentMin[1] else currentMin
+                manD = getManDis(state, f)
+                currentMin = [f, manD] if manD < currentMin[1] else currentMin
 
         return state == currentMin[0]
 
