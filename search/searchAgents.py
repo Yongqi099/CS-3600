@@ -46,6 +46,7 @@ import search
 def getManDis(xy1, xy2):
     return util.manhattanDistance(xy1, xy2)
 
+
 class GoWestAgent(Agent):
     """
     An agent that goes West until it can't.
@@ -416,8 +417,7 @@ def cornersHeuristic(state, problem):
         hMove = ((0, 0), 999999)
         for corner in corners:
             mDis = getManDis(current[0], corner)
-            if corner not in current[1] and mDis < hMove[1]:
-                hMove = (corner, mDis)
+            hMove = (corner, mDis) if corner not in current[1] and mDis < hMove[1] else hMove
 
         current[0] = hMove[0]
         current[1] += (current[0],)
@@ -544,23 +544,22 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    # [(1, 1), (1, 4), (1, 5), (2, 1), (3, 1), (4, 1), (4, 4), (5, 1), (7, 4), (10, 4), (13, 4), (13, 5), (14, 5)]
-    if state[1].count() == 0:
-        return 0
-
+    # Grid: [(1, 1), (1, 4), (1, 5), (2, 1), (3, 1), (4, 1), (4, 4), (5, 1), (7, 4), (10, 4), (13, 4), (13, 5), (14, 5)]
     # (0, 0) at bottom left
+    h = 0
     fList = foodGrid.asList()
-    # (x1, y1), (x2, y2), heuristic
-    current = [fList[0], fList[0], 0]
+    if len(fList) != 0:
+        # (x1, y1), (x2, y2), heuristic
+        current = [fList[0], fList[0], 0]
 
-    for f1 in fList:
-        for f2 in fList:
-            if getManDis(f1, f2) > current[2]:
-                current = [f1, f2, getManDis(f1, f2)]
+        for f1 in fList:
+            for f2 in fList:
+                manD = getManDis(f1, f2)
+                current = [f1, f2, manD] if manD > current[2] else current
 
-    minF = min(getManDis(position, current[0]),
-               getManDis(position, current[1]))
-    h = minF + current[2]
+        minF = min(getManDis(position, current[0]),
+                   getManDis(position, current[1]))
+        h = minF + current[2]
     return h
 
 
@@ -633,16 +632,16 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test
         that will complete the problem definition.
         """
-        x, y = state
-
+        # x, y = state
         "*** YOUR CODE HERE ***"
         fList = self.food.asList()
+        # closestF, mDis
         currentMin = [fList[0], getManDis(state, fList[0])]
+
         if len(fList) != 0:
             for f in fList:
                 mDis = getManDis(state, f)
-                if mDis < currentMin[1]:
-                    currentMin = [f, mDis]
+                currentMin = [f, mDis] if mDis < currentMin[1] else currentMin
 
         return state == currentMin[0]
 
