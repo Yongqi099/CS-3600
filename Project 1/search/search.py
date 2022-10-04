@@ -21,6 +21,12 @@ by Pacman agents (in searchAgents.py).
 import util
 
 
+def popToCur(openList, cur):
+    p = openList.pop()
+    for i in range(len(cur)):
+        cur[i] = p[i]
+
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -85,13 +91,32 @@ def depthFirstSearch(problem):
 
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
-
+    """
+    """
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
+
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    openList = util.Stack()
+    closedList = set()
+    current = [problem.getStartState(), []]
+
+    while not problem.isGoalState(current[0]):
+        cur = current[0]
+
+        if cur not in closedList:
+            closedList.add(cur)
+            successors = problem.getSuccessors(cur)
+
+            for successor in successors:
+                openList.push(((successor[0]), current[1] + [successor[1]]))
+
+        popToCur(openList, current)
+    return current[1]
+
+    # util.raiseNotDefined()
 
 
 def breadthFirstSearch(problem):
@@ -99,7 +124,22 @@ def breadthFirstSearch(problem):
     Search the shallowest nodes in the search tree first.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    openList = util.Queue()
+    closedList = set()
+    current = [problem.getStartState(), []]
+
+    while not problem.isGoalState(current[0]):
+
+        cur = current[0]
+        if cur not in closedList:
+            closedList.add(cur)
+            successors = problem.getSuccessors(cur)
+
+            for successor in successors:
+                openList.push(((successor[0]), current[1] + [successor[1]]))
+
+        popToCur(openList, current)
+    return current[1]
 
 
 def uniformCostSearch(problem):
@@ -107,7 +147,27 @@ def uniformCostSearch(problem):
     Search the node of least total cost first.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    openList = util.PriorityQueue()
+    closedList = set()
+    # (int, int), "String", int
+    current = [problem.getStartState(), [], 0]
+
+    while not problem.isGoalState(current[0]):
+        cur0 = current[0]
+
+        if cur0 not in closedList:
+            closedList.add(cur0)
+            successors = problem.getSuccessors(cur0)
+
+            for successor in successors:
+                c = current[2] + successor[2]
+                openList.push((
+                    (successor[0]),
+                    (current[1] + [successor[1]]),
+                    c),
+                    c)
+        popToCur(openList, current)
+    return current[1]
 
 
 def nullHeuristic(state, problem=None):
@@ -123,7 +183,30 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     Search the node that has the lowest combined cost and heuristic first.
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    openList = util.PriorityQueue()
+    closedList = set()
+    # (int, int), "String", int
+    current = [problem.getStartState(), [], 0]
+
+    while not problem.isGoalState(current[0]):
+        cur0 = current[0]
+
+        if cur0 not in closedList:
+            closedList.add(cur0)
+            successors = problem.getSuccessors(cur0)
+
+            for successor in successors:
+                h = heuristic(successor[0], problem)
+                g = current[2] + successor[2]
+                c = g + h
+
+                openList.push((
+                    (successor[0]),
+                    (current[1] + [successor[1]]),
+                    g),
+                c)
+        popToCur(openList, current)
+    return current[1]
 
 
 # Abbreviations
