@@ -25,6 +25,7 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+# collaborated with Avaneesh Naren on the return value of the function computeActionFromValues
 
 import mdp, util
 
@@ -57,29 +58,23 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.discount = discount
         self.iterations = iterations
         self.values = util.Counter()  # A Counter is a dict with default 0
+        self.nValues = self.values.copy()
         self.runValueIteration()
 
     # TODO
     def runValueIteration(self):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        nValues = self.nValues
 
-        nValues = util.Counter()
         for i in range(self.iterations):
             for s in self.mdp.getStates():
                 maxQ = float('-inf')
                 for a in self.mdp.getPossibleActions(s):
                     maxQ = max(maxQ, self.getQValue(s, a))
-                    nValues[s] = maxQ if maxQ != float('-inf') else nValues
-            # print(self.values, end="\n\n")
-            # print(nValues, end="\n\n")
+                    nValues[s] = maxQ
             for s in self.values:
-                # print(self.values[s])
-                # print(nValues[s])
-                # print(end="\n\n")
                 self.values[s] = nValues[s]
-            # print(self.values)
-            # print(end="\n\n\n\n\n")
 
     def getValue(self, state):
         """
@@ -96,8 +91,9 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
         qValue = 0
         nextStates = self.mdp.getTransitionStatesAndProbs(state, action)  # list of (nextState, prob)
+        reward = self.mdp.getReward(state, action, None)
+
         for ns, p in nextStates:
-            reward = self.mdp.getReward(state, action, ns)
             value = self.values[ns] * self.discount
             expectedRV = (reward + value) * p
             qValue = qValue + expectedRV
@@ -120,7 +116,7 @@ class ValueIterationAgent(ValueEstimationAgent):
             return None
 
         actions = self.mdp.getPossibleActions(state)
-        bestAction = (None, float('-inf'))  # bestAction
+        bestAction = (None, float('-inf'))  # bestAction: action, qValue
         for a in actions:
             qValue = self.getQValue(state, a)
             bestAction = [a, qValue] if bestAction[1] < qValue else bestAction
