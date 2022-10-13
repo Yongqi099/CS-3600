@@ -26,6 +26,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 # collaborated with Avaneesh Naren on the return value of the function computeActionFromValues
+import math
 
 import mdp, util
 
@@ -113,16 +114,17 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** YOUR CODE HERE ***"
         # state is (x,y)
-
-        if self.mdp.isTerminal(state):
-            return None
-
         actions = self.mdp.getPossibleActions(state)
-        bestAction = (None, float('-inf'))  # bestAction: action, qValue
-        for a in actions:
-            qValue = self.getQValue(state, a)
-            bestAction = [a, qValue] if bestAction[1] < qValue else bestAction
-        return bestAction[0]
+        bestAction = None  # bestAction: action, qValue
+
+        if not self.mdp.isTerminal(state):
+            bestVal = self.getValue(state)
+            for a in actions:
+                qValue = self.getQValue(state, a)
+                if math.isclose(qValue, bestVal, abs_tol=10 ** -7):
+                    bestAction = a
+                    break
+        return bestAction
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
