@@ -89,12 +89,12 @@ class QLearningAgent(ReinforcementAgent):
         if len(actions) == 0:
             return None
 
-        bestActions = []
+        bestActions = None
         bestVal = self.getValue(state)
 
         for a in actions:
-            bestActions.append(a) if qValues[(state, a)] == bestVal else bestActions
-        return random.choice(bestActions)
+            bestActions = a if qValues[(state, a)] == bestVal else bestActions
+        return bestActions
 
     # TODO
     def getAction(self, state):
