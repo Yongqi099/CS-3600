@@ -86,15 +86,15 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         actions = self.getLegalActions(state)
         qValues = self.qTable
-        if len(actions) == 0:
-            return None
+        bestAction = None
 
-        bestActions = None
-        bestVal = self.getValue(state)
-
-        for a in actions:
-            bestActions = a if qValues[(state, a)] == bestVal else bestActions
-        return bestActions
+        if len(actions) != 0:
+            bestVal = self.getValue(state)
+            for a in actions:
+                if qValues[(state, a)] == bestVal:
+                    bestAction = a
+                    break
+        return bestAction
 
     # TODO
     def getAction(self, state):
