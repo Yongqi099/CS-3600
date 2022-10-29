@@ -293,8 +293,16 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
+        pacPos = gameState.getPacmanPosition()
+        jPos = self.getJailPosition
+        allPos = self.allPositions
+        newBelief = self.beliefs.copy()
+
+        for p in allPos:
+            eModel = self.getObservationProb(observation, pacPos, p, jPos)
+            newBelief[p] = eModel * self.beliefs[p]
+        self.beliefs = newBelief
         self.beliefs.normalize()
-        raiseNotDefined()
     def elapseTime(self, gameState):
         """
         Predict beliefs in response to a time step passing from the current
