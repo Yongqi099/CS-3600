@@ -293,11 +293,8 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
-
-
         self.beliefs.normalize()
         raiseNotDefined()
-
     def elapseTime(self, gameState):
         """
         Predict beliefs in response to a time step passing from the current
