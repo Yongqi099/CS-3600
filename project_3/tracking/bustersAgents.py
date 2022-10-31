@@ -10,7 +10,8 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+import logging
+logging.basicConfig(level=logging.DEBUG, filename="Question3.log", filemode="w")
 
 import util
 from game import Agent
@@ -161,11 +162,25 @@ class GreedyBustersAgent(BustersAgent):
 
         """
         pacmanPosition = gameState.getPacmanPosition()
-        legal = [a for a in gameState.getLegalPacmanActions()]
+        legalActions = [a for a in gameState.getLegalPacmanActions()]
         livingGhosts = gameState.getLivingGhosts()
-        livingGhostPositionDistributions = \
-            [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
-             if livingGhosts[i+1]]
+        livingGhostPositionDistributions = [beliefs for i, beliefs in enumerate(self.ghostBeliefs) if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
 
-        util.raiseNotDefined()
+        gPos = float('inf')
+        gDis = float('inf')
+        for dist in livingGhostPositionDistributions:
+            maxDist = dist.argMax()
+            mazeDis = self.distancer.getDistance(pacmanPosition, maxDist)
+            if mazeDis < gDis:
+                gPos = maxDist
+                gDis = mazeDis
+
+        bestAction = [None, float('inf')]
+        for a in legalActions:
+            sucPos = Actions.getSuccessor(pacmanPosition, a)
+            sucDis = self.distancer.getDistance(sucPos, gPos)
+            if sucDis < bestAction[1]:
+                bestAction = [a, sucDis]
+
+        return bestAction[0]
