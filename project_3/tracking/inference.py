@@ -6,11 +6,13 @@ import game
 from util import manhattanDistance, raiseNotDefined
 import util
 
+
 class DiscreteDistribution(dict):
     """
     A DiscreteDistribution models belief distributions and weight distributions
     over a finite set of discrete keys.
     """
+
     def __getitem__(self, key):
         self.setdefault(key, 0)
         return dict.__getitem__(self, key)
@@ -60,16 +62,12 @@ class DiscreteDistribution(dict):
         {}
         """
 
-
         if self.total() == 0.0:
             return
 
         tot = self.total()
         for key in self.keys():
-            self[key] = float(self[key])/tot
-
-
-
+            self[key] = float(self[key]) / tot
 
     def sample(self):
         """
@@ -92,27 +90,26 @@ class DiscreteDistribution(dict):
         0.0
         """
 
-
         s_seq = []
         s_weights = []
 
         for item in self.items():
             s_seq.append(item[0])
-            s_weights.append(float(item[1])/float(self.total()))
+            s_weights.append(float(item[1]) / float(self.total()))
 
         x = random.random()
 
         for i, val in enumerate(s_seq):
-            if x<=s_weights[i]:
+            if x <= s_weights[i]:
                 return val
-            x-=s_weights[i]
-
+            x -= s_weights[i]
 
 
 class InferenceModule:
     """
     An inference module tracks a belief distribution over a ghost's location.
     """
+
     ############################################
     # Useful methods for all inference modules #
     ############################################
@@ -142,7 +139,7 @@ class InferenceModule:
             dist[jail] = 1.0
             return dist
         pacmanSuccessorStates = game.Actions.getLegalNeighbors(pacmanPosition, \
-                gameState.getWalls())  # Positions Pacman can move to
+                                                               gameState.getWalls())  # Positions Pacman can move to
         if ghostPosition in pacmanSuccessorStates:  # Ghost could get caught
             mult = 1.0 / float(len(pacmanSuccessorStates))
             dist[jail] = mult
@@ -182,14 +179,13 @@ class InferenceModule:
             return 1
         elif noisyDistance == None and jailPosition != ghostPosition:
             return 0
-        elif noisyDistance != None and jailPosition ==ghostPosition:
+        elif noisyDistance != None and jailPosition == ghostPosition:
             return 0
 
-
-        obs = busters.getObservationProbability(noisyDistance, manhattanDistance(pacmanPosition,ghostPosition))
+        obs = busters.getObservationProbability(noisyDistance, manhattanDistance(pacmanPosition, ghostPosition))
         return obs
 
-        #raiseNotDefined()
+        # raiseNotDefined()
 
     def setGhostPosition(self, gameState, ghostPosition, index):
         """
@@ -270,6 +266,7 @@ class ExactInference(InferenceModule):
     The exact dynamic inference module should use forward algorithm updates to
     compute the exact belief function at each time step.
     """
+
     def initializeUniformly(self, gameState):
         """
         Begin with a uniform distribution over legal ghost positions (i.e., not
@@ -303,6 +300,7 @@ class ExactInference(InferenceModule):
             newBelief[p] = eModel * self.beliefs[p]
         self.beliefs = newBelief
         self.beliefs.normalize()
+
     def elapseTime(self, gameState):
         """
         Predict beliefs in response to a time step passing from the current
@@ -323,14 +321,20 @@ class ExactInference(InferenceModule):
 
         """
         "*** YOUR CODE HERE ***"
+        # Goal: find P( G = pos) at time t
+        # recursively compute P(G = pos) at time t-1
 
+        beliefs = self.beliefs
+        newBeliefs = util.Counter()
+        gPos = self.allPositions
 
+        for p in gPos:
+            newPosDist = self.getPositionDistribution(gameState, p)
+            for newPos, prob in newPosDist.items():
+                newBeliefs[newPos] += prob * beliefs[p]
 
-
+        self.beliefs = newBeliefs
         self.beliefs.normalize()
-
-
-        raiseNotDefined()
 
     def getBeliefDistribution(self):
         return self.beliefs
@@ -340,6 +344,7 @@ class ParticleFilter(InferenceModule):
     """
     A particle filter for approximately tracking a single ghost.
     """
+
     def __init__(self, ghostAgent, numParticles=300):
         InferenceModule.__init__(self, ghostAgent)
         self.setNumParticles(numParticles)
@@ -357,9 +362,6 @@ class ParticleFilter(InferenceModule):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
-
-
-
 
         raiseNotDefined()
 
@@ -389,8 +391,6 @@ class ParticleFilter(InferenceModule):
 
         tmp = DiscreteDistribution()
 
-
-
     def elapseTime(self, gameState):
         """
         Sample each particle's next state based on its current state and the
@@ -407,9 +407,6 @@ class ParticleFilter(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
 
-
-
-
         raiseNotDefined()
 
     def getBeliefDistribution(self):
@@ -422,8 +419,6 @@ class ParticleFilter(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
 
-
-
         raiseNotDefined()
 
 
@@ -432,6 +427,7 @@ class JointParticleFilter(ParticleFilter):
     JointParticleFilter tracks a joint distribution over tuples of all ghost
     positions.
     """
+
     def __init__(self, numParticles=600):
         self.setNumParticles(numParticles)
 
@@ -497,10 +493,6 @@ class JointParticleFilter(ParticleFilter):
         """
         "*** YOUR CODE HERE ***"
 
-
-
-
-
         raiseNotDefined()
 
     def elapseTime(self, gameState):
@@ -525,10 +517,6 @@ class JointParticleFilter(ParticleFilter):
             "*** YOUR CODE HERE ***"
             raiseNotDefined()
 
-
-
-
-
             """*** END YOUR CODE HERE ***"""
             newParticles.append(tuple(newParticle))
         self.particles = newParticles
@@ -543,6 +531,7 @@ class MarginalInference(InferenceModule):
     A wrapper around the JointInference module that returns marginal beliefs
     about ghosts.
     """
+
     def initializeUniformly(self, gameState):
         """
         Set the belief state to an initial, prior value.
