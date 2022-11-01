@@ -171,14 +171,16 @@ class GreedyBustersAgent(BustersAgent):
         gPos = float('inf')
         gDis = float('inf')
         for dist in livingGhostPositionDistributions:
-            bestDist = dist.argMax()  # find the most likely pos of each ghost
-            mazeDis = self.distancer.getDistance(pacmanPosition, bestDist)
+            maxDist = dist.argMax()  # find the most likely pos of each ghost
+            # print(dist)
+            # print(maxDist)
+            mazeDis = self.distancer.getDistance(pacmanPosition, maxDist)
             if mazeDis < gDis:
-                gPos = bestDist
+                gPos = maxDist
                 gDis = mazeDis
 
         # find the best action that brings pacman to the closest ghost
-        bestAction = [None, float('inf')]
+        bestAction = [None, float('inf')]   # [action, mazeDistance]
         for a in legalActions:
             sucPos = Actions.getSuccessor(pacmanPosition, a)
             sucDis = self.distancer.getDistance(sucPos, gPos)

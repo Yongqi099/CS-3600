@@ -291,9 +291,9 @@ class ExactInference(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
         pacPos = gameState.getPacmanPosition()
-        jPos = self.getJailPosition
+        jPos = self.getJailPosition()
         allPos = self.allPositions
-        newBelief = self.beliefs.copy()
+        newBelief = util.Counter()
 
         for p in allPos:
             eModel = self.getObservationProb(observation, pacPos, p, jPos)
