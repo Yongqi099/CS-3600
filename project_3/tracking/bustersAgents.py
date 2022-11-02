@@ -10,8 +10,6 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-import logging
-logging.basicConfig(level=logging.DEBUG, filename="Question3.log", filemode="w")
 
 import util
 from game import Agent
@@ -172,8 +170,6 @@ class GreedyBustersAgent(BustersAgent):
         gDis = float('inf')
         for dist in livingGhostPositionDistributions:
             maxDist = dist.argMax()  # find the most likely pos of each ghost
-            # print(dist)
-            # print(maxDist)
             mazeDis = self.distancer.getDistance(pacmanPosition, maxDist)
             if mazeDis < gDis:
                 gPos = maxDist

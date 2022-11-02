@@ -1,4 +1,5 @@
 import itertools
+import logging
 import random
 import busters
 import game
@@ -6,6 +7,8 @@ import game
 from util import manhattanDistance, raiseNotDefined
 import util
 
+import logging
+logging.basicConfig(level=logging.DEBUG, filename="Particle.log", filemode="w")
 
 class DiscreteDistribution(dict):
     """
@@ -363,8 +366,16 @@ class ParticleFilter(InferenceModule):
         self.particles = []
         "*** YOUR CODE HERE ***"
 
-        raiseNotDefined()
-
+        num = self.numParticles
+        initializing = True
+        while initializing:
+            for p in self.legalPositions:
+                if num > 0:
+                    self.particles.append(p)
+                    num -= 1
+                else:
+                    initializing = False
+                    break
     def observeUpdate(self, observation, gameState):
         """
         Resample particles based on the distance observation and Pacman's position.
@@ -388,8 +399,20 @@ class ParticleFilter(InferenceModule):
 
         """
         "*** YOUR CODE HERE ***"
-
         tmp = DiscreteDistribution()
+        pacPos = gameState.getPacmanPosition()
+        jPos = self.getJailPosition()
+        beliefs = self.getBeliefDistribution()
+        self.particles = []
+
+        for p in self.legalPositions:
+            emodel = self.getObservationProb(observation, pacPos, p, jPos)
+            tmp[p] = emodel * beliefs[p]
+        if tmp.total() == 0:
+            self.initializeUniformly(gameState)
+        else:
+            for num in range(0, self.numParticles):
+                self.particles.append(tmp.sample())
 
     def elapseTime(self, gameState):
         """
@@ -407,7 +430,6 @@ class ParticleFilter(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
 
-        raiseNotDefined()
 
     def getBeliefDistribution(self):
         """
@@ -419,7 +441,11 @@ class ParticleFilter(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
 
-        raiseNotDefined()
+        beliefDist = util.Counter()
+        for p in self.particles:
+            beliefDist[p] += 1      # counts the number of particles at each distribution
+        beliefDist.normalize()
+        return beliefDist
 
 
 class JointParticleFilter(ParticleFilter):
