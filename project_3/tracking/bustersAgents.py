@@ -166,6 +166,7 @@ class GreedyBustersAgent(BustersAgent):
         "*** YOUR CODE HERE ***"
 
         # find the closest ghost
+        closestGhost = [float('inf'), float('inf')]
         gPos = float('inf')
         gDis = float('inf')
         for dist in livingGhostPositionDistributions:

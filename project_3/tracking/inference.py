@@ -411,7 +411,8 @@ class ParticleFilter(InferenceModule):
             emodel = self.getObservationProb(observation, pacPos, p, jPos)
             weights[p] = emodel * beliefs[p]
 
-        if weights.total() == 0:  # if edge case
+        # if edge case
+        if weights.total() == 0:
             self.initializeUniformly(gameState)
         # else sample from weights to create new particle list
         else:
