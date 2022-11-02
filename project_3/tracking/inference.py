@@ -1,5 +1,4 @@
 import itertools
-import logging
 import random
 import busters
 import game
@@ -7,8 +6,9 @@ import game
 from util import manhattanDistance, raiseNotDefined
 import util
 
-import logging
-logging.basicConfig(level=logging.DEBUG, filename="Particle.log", filemode="w")
+
+# import logging
+# logging.basicConfig(level=logging.DEBUG, filename="Particle.log", filemode="w")
 
 class DiscreteDistribution(dict):
     """
@@ -376,6 +376,7 @@ class ParticleFilter(InferenceModule):
                 else:
                     initializing = False
                     break
+
     def observeUpdate(self, observation, gameState):
         """
         Resample particles based on the distance observation and Pacman's position.
@@ -399,20 +400,24 @@ class ParticleFilter(InferenceModule):
 
         """
         "*** YOUR CODE HERE ***"
-        tmp = DiscreteDistribution()
+        weights = DiscreteDistribution()
         pacPos = gameState.getPacmanPosition()
         jPos = self.getJailPosition()
         beliefs = self.getBeliefDistribution()
         self.particles = []
 
-        for p in self.legalPositions:
+        # construct a weight distributions
+        for p in self.allPositions:
             emodel = self.getObservationProb(observation, pacPos, p, jPos)
-            tmp[p] = emodel * beliefs[p]
-        if tmp.total() == 0:
+            weights[p] = emodel * beliefs[p]
+
+        if weights.total() == 0:  # if edge case
             self.initializeUniformly(gameState)
+        # else sample from weights to create new particle list
         else:
-            for num in range(0, self.numParticles):
-                self.particles.append(tmp.sample())
+            for n in range(self.numParticles):
+                self.particles.append(weights.sample())
+
 
     def elapseTime(self, gameState):
         """
@@ -431,11 +436,9 @@ class ParticleFilter(InferenceModule):
         "*** YOUR CODE HERE ***"
 
         newParticles = []
-        dist = DiscreteDistribution()
         for p in self.particles:
             newPosDist = self.getPositionDistribution(gameState, p)
             newParticles.append(DiscreteDistribution.sample(newPosDist))
-
         self.particles = newParticles
 
     def getBeliefDistribution(self):
@@ -450,7 +453,7 @@ class ParticleFilter(InferenceModule):
 
         beliefDist = util.Counter()
         for p in self.particles:
-            beliefDist[p] += 1      # counts the number of particles at each position
+            beliefDist[p] += 1  # counts the number of particles at each position
         beliefDist.normalize()
         return beliefDist
 
