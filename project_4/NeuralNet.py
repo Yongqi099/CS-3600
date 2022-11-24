@@ -41,6 +41,7 @@ class Perceptron(object):
             the value.
         """
         """YOUR CODE"""
+        return 1 / (1 + exp(-value))
 
     def sigmoidActivation(self, inActs):
         """
@@ -55,6 +56,11 @@ class Perceptron(object):
             The value of the sigmoid of the weighted input
         """
         """YOUR CODE"""
+        inActs.insert(0, 1.0)
+        sigmoid = self.sigmoid(self.getWeightedSum(inActs))
+        inActs.pop(0)
+
+        return sigmoid
 
     def sigmoidDeriv(self, value):
         """
@@ -82,6 +88,7 @@ class Perceptron(object):
             The derivative of the sigmoid of the weighted input
         """
         """YOUR CODE"""
+
 
     def updateWeights(self, inActs, alpha, delta):
         """
@@ -173,7 +180,17 @@ class NeuralNet(object):
             lists of the output values of all perceptrons in each layer.
         """
         """YOUR CODE"""
+        output = [inActs]  # first list is input list
+        curInputs = inActs
+        layers = self.layers
 
+        for layer in layers:
+            newInputs = []  # list for new inputs
+            for node in layer:
+                newInputs.append(node.sigmoidActivation(curInputs))  # gets the output of each node
+            curInputs = newInputs  # update curInputs
+            output.append(curInputs)  # update list to contain value of all perceptrons in each layer
+        return output
     def backPropLearning(self, examples, alpha):
         """
         Run a single iteration of backward propagation learning algorithm.
