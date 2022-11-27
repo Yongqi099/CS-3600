@@ -4,15 +4,17 @@ from datetime import datetime
 from math import exp
 from random import random, randint, choice
 
+
 class Perceptron(object):
     """
     Class to represent a single Perceptron in the net.
     """
+
     def __init__(self, inSize=1, weights=None):
-        self.inSize = inSize+1#number of perceptrons feeding into this one; add one for bias
+        self.inSize = inSize + 1  # number of perceptrons feeding into this one; add one for bias
         if weights is None:
-            #weights of previous layers into this one, random if passed in as None
-            self.weights = [1.0]*self.inSize
+            # weights of previous layers into this one, random if passed in as None
+            self.weights = [1.0] * self.inSize
             self.setRandomWeights()
         else:
             self.weights = weights
@@ -27,7 +29,7 @@ class Perceptron(object):
             float
             The weighted sum
         """
-        return sum([inAct*inWt for inAct,inWt in zip(inActs,self.weights)])
+        return sum([inAct * inWt for inAct, inWt in zip(inActs, self.weights)])
 
     def sigmoid(self, value):
         """
@@ -74,6 +76,10 @@ class Perceptron(object):
             parametrized by the value.
         """
         """YOUR CODE"""
+        a = self.sigmoid(value)
+        b = 1 - a
+        deriv = a * b
+        return deriv
 
     def sigmoidActivationDeriv(self, inActs):
         """
@@ -88,7 +94,11 @@ class Perceptron(object):
             The derivative of the sigmoid of the weighted input
         """
         """YOUR CODE"""
+        inActs.insert(0, 1.0)
+        sigmoid = self.sigmoidDeriv(self.getWeightedSum(inActs))
+        inActs.pop(0)
 
+        return sigmoid
 
     def updateWeights(self, inActs, alpha, delta):
         """
@@ -107,6 +117,19 @@ class Perceptron(object):
         """
         totalModification = 0
         """YOUR CODE"""
+        inActs.insert(0, 1.0)
+        weights = []
+
+        for i, weight in enumerate(self.weights):
+            newWeight = weight + (alpha * inActs[i] * delta)
+            weights.append(newWeight)
+
+            modification = abs(newWeight - weight)
+            totalModification += modification
+
+        inActs.pop(0)
+        self.weights = weights
+
         return totalModification
 
     def setRandomWeights(self):
@@ -114,58 +137,60 @@ class Perceptron(object):
         Generates random input weights that vary from -1.0 to 1.0
         """
         for i in range(self.inSize):
-            self.weights[i] = (random() + .0001) * (choice([-1,1]))
+            self.weights[i] = (random() + .0001) * (choice([-1, 1]))
 
     def __str__(self):
         """ toString """
         outStr = ''
-        outStr += 'Perceptron with %d inputs\n'%self.inSize
-        outStr += 'Node input weights %s\n'%str(self.weights)
+        outStr += 'Perceptron with %d inputs\n' % self.inSize
+        outStr += 'Node input weights %s\n' % str(self.weights)
         return outStr
+
 
 class NeuralNet(object):
     """
     Class to hold the net of perceptrons and implement functions for it.
     """
-    def __init__(self, layerSize):#default 3 layer, 1 percep per layer
+
+    def __init__(self, layerSize):  # default 3 layer, 1 percep per layer
         """
         Initiates the NN with the given sizes.
 
         Args:
             layerSize (list<int>): the number of perceptrons in each layer
         """
-        self.layerSize = layerSize #Holds number of inputs and percepetrons in each layer
+        self.layerSize = layerSize  # Holds number of inputs and percepetrons in each layer
         self.outputLayer = []
-        self.numHiddenLayers = len(layerSize)-2
+        self.numHiddenLayers = len(layerSize) - 2
         self.hiddenLayers = [[] for x in range(self.numHiddenLayers)]
-        self.numLayers =  self.numHiddenLayers+1
+        self.numLayers = self.numHiddenLayers + 1
 
-        #build hidden layer(s)
+        # build hidden layer(s)
         for h in range(self.numHiddenLayers):
-            for p in range(layerSize[h+1]):
-                percep = Perceptron(layerSize[h]) # num of perceps feeding into this one
+            for p in range(layerSize[h + 1]):
+                percep = Perceptron(layerSize[h])  # num of perceps feeding into this one
                 self.hiddenLayers[h].append(percep)
 
-        #build output layer
+        # build output layer
         for i in range(layerSize[-1]):
-            percep = Perceptron(layerSize[-2]) # num of perceps feeding into this one
+            percep = Perceptron(layerSize[-2])  # num of perceps feeding into this one
             self.outputLayer.append(percep)
 
-        #build layers list that holds all layers in order - use this structure
+        # build layers list that holds all layers in order - use this structure
         # to implement back propagation
         self.layers = [self.hiddenLayers[h] for h in range(self.numHiddenLayers)] + [self.outputLayer]
 
     def __str__(self):
         """toString"""
         outStr = ''
-        outStr +='\n'
+        outStr += '\n'
         for hiddenIndex in range(self.numHiddenLayers):
-            outStr += '\nHidden Layer #%d'%hiddenIndex
+            outStr += '\nHidden Layer #%d' % hiddenIndex
             for index in range(len(self.hiddenLayers[hiddenIndex])):
-                outStr += 'Percep #%d: %s'%(index,str(self.hiddenLayers[hiddenIndex][index]))
-            outStr +='\n'
+                outStr += 'Percep #%d: %s' % (index, str(self.hiddenLayers[hiddenIndex][index]))
+            outStr += '\n'
         for i in range(len(self.outputLayer)):
-            outStr += 'Output Percep #%d:%s'%(i,str(self.outputLayer[i]))
+            outStr += 'Output Percep #%d:%s' % (i, str(self.outputLayer[i]))
         return outStr
 
     def feedForward(self, inActs):
@@ -191,6 +216,7 @@ class NeuralNet(object):
             curInputs = newInputs  # update curInputs
             output.append(curInputs)  # update list to contain value of all perceptrons in each layer
         return output
+
     def backPropLearning(self, examples, alpha):
         """
         Run a single iteration of backward propagation learning algorithm.
@@ -209,25 +235,30 @@ class NeuralNet(object):
            averageWeightChange is the summed absolute weight change of all perceptrons,
            divided by the sum of their input sizes (the average weight change for a single perceptron).
         """
-        #keep track of output
+        # keep track of output
         averageError = 0
         averageWeightChange = 0
         numWeights = 0
+        # print(examples)
 
-        for example in examples:#for each example
-            #keep track of deltas to use in weight change
+        for example in examples:  # for each example
+            # keep track of deltas to use in weight change
             deltas = []
-            #Neural net output list
-            allLayerOutput = """FILL IN - neural net output list computation"""
+            # Neural net output list
+            # TODO
+            allLayerOutput = self.feedForward(example[0])  # """FILL IN - neural net output list computation"""
+
             lastLayerOutput = allLayerOutput[-1]
-            #Empty output layer delta list
+            # Empty output layer delta list
             outDelta = []
-            #iterate through all output layer neurons
+            # iterate through all output layer neurons
             for outputNum in range(len(example[1])):
-                gPrime = self.outputLayer[outputNum].sigmoidActivationDeriv("""FILL IN""")
-                error = """FILL IN - error for this neuron"""
-                delta = """FILL IN - delta for this neuron"""
-                averageError+=error*error/2
+                # TODO
+                gPrime = self.outputLayer[outputNum].sigmoidActivationDeriv((allLayerOutput[len(allLayerOutput)-2]))  # """FILL IN"""
+                error = example[1][outputNum] - lastLayerOutput[outputNum]  # """FILL IN - error for this neuron"""
+                delta = gPrime * error  # """FILL IN - delta for this neuron"""
+
+                averageError += error * error / 2
                 outDelta.append(delta)
             deltas.append(outDelta)
 
@@ -235,36 +266,49 @@ class NeuralNet(object):
             Backpropagate through all hidden layers, calculating and storing
             the deltas for each perceptron layer.
             """
-            for layerNum in range(self.numHiddenLayers-1,-1,-1):
+            for layerNum in range(self.numHiddenLayers - 1, -1, -1):
                 layer = self.layers[layerNum]
-                nextLayer = self.layers[layerNum+1]
+                nextLayer = self.layers[layerNum + 1]
                 hiddenDelta = []
-                #Iterate through all neurons in this layer
+                # Iterate through all neurons in this layer
                 for neuronNum in range(len(layer)):
-                    gPrime = layer[neuronNum].sigmoidActivationDeriv("""FILL IN""")
-                    delta = """FILL IN - delta for this neuron
-                               Carefully look at the equation here,
-                                it is easy to do this by intuition incorrectly"""
+                    gPrime = layer[neuronNum].sigmoidActivationDeriv(allLayerOutput[layerNum])
+
+                    """FILL IN - delta for this neuron Carefully look at the equation here, it is easy to do this by 
+                    intuition incorrectly """
+                    # TODO
+                    delta = 0.0
+                    for n in range(len(nextLayer)):
+                        delta += nextLayer[n].weights[neuronNum + 1] * deltas[0][n]
+                    delta *= gPrime
+
                     hiddenDelta.append(delta)
-                deltas = [hiddenDelta]+deltas
+                deltas = [hiddenDelta] + deltas
 
             """
             Having aggregated all deltas, update the weights of the
             hidden and output layers accordingly.
             """
-            for numLayer in range(0,self.numLayers):
+            for numLayer in range(0, self.numLayers):
                 layer = self.layers[numLayer]
                 for numNeuron in range(len(layer)):
-                    weightMod = layer[numNeuron].updateWeights("""FILL IN""")
+                    # TODO
+                    perceptron = layer[numNeuron]
+                    inActs = allLayerOutput[numLayer]
+                    delta = deltas[numLayer][numNeuron]
+                    weightMod = perceptron.updateWeights(inActs, alpha, delta)  # """FILL IN"""
+
                     averageWeightChange += weightMod
                     numWeights += layer[numNeuron].inSize
-            #end for each example
-        #calculate final output
-        averageError /= (len(examples)*len(examples[0][1]))             #number of examples x length of output vector
-        averageWeightChange/=(numWeights)
+            # end for each example
+        # calculate final output
+        averageError /= (len(examples) * len(examples[0][1]))  # number of examples x length of output vector
+        averageWeightChange /= (numWeights)
         return averageError, averageWeightChange
 
-def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold = 0.00008,hiddenLayerList = [1], maxItr = sys.maxsize, startNNet = None):
+
+def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold=0.00008, hiddenLayerList=[1], maxItr=sys.maxsize,
+                   startNNet=None):
     """
     Train a neural net for the given input.
 
@@ -285,50 +329,68 @@ def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold = 0.00008,hiddenLa
        once the weight modification reached the threshold, or the iteration
        exceeds the maximum iteration.
     """
-    examplesTrain,examplesTest = examples
+    examplesTrain, examplesTest = examples
     numIn = len(examplesTrain[0][0])
     numOut = len(examplesTest[0][1])
     time = datetime.now().time()
     if startNNet is not None:
         hiddenLayerList = [len(layer) for layer in startNNet.hiddenLayers]
-    print ("Starting training at time %s with %d inputs, %d outputs, %s hidden layers, size of training set %d, and size of test set %d"\
-                                                    %(str(time),numIn,numOut,str(hiddenLayerList),len(examplesTrain),len(examplesTest)))
-    layerList = [numIn]+hiddenLayerList+[numOut]
+    print("Starting training at time %s with %d inputs, %d outputs, %s hidden layers, size of training set %d, "
+          "and size of test set %d"\
+          % (str(time), numIn, numOut, str(hiddenLayerList), len(examplesTrain), len(examplesTest)))
+    layerList = [numIn] + hiddenLayerList + [numOut]
     nnet = NeuralNet(layerList)
     if startNNet is not None:
-        nnet =startNNet
+        nnet = startNNet
     """
     YOUR CODE
     """
-    iteration=0
-    trainError=0
-    weightMod=0
+    iteration = 0
+    trainError = 0
+    weightMod = float("inf")
 
     """
     Iterate for as long as it takes to reach weight modification threshold
     """
-        #if iteration%10==0:
-        #    print '! on iteration %d; training error %f and weight change %f'%(iteration,trainError,weightMod)
-        #else :
-        #    print '.',
+    #TODO
+    while iteration < maxItr and weightMod > weightChangeThreshold:
+        trainError, weightMod = nnet.backPropLearning(examplesTrain, alpha)
+        iteration += 1
 
+        if iteration % 10 == 0:
+            print('! on iteration %d; training error %f and weight change %f' % (iteration, trainError, weightMod))
 
     time = datetime.now().time()
-    print ('Finished after %d iterations at time %s with training error %f and weight change %f'%(iteration,str(time),trainError,weightMod))
+    print('Finished after %d iterations at time %s with training error %f and weight change %f' % (
+        iteration, str(time), trainError, weightMod))
 
-    """
-    Get the accuracy of your Neural Network on the test examples.
-    For each text example, you should first feedforward to get the NN outputs. Then, round the list of outputs from the output layer of the neural net.
-    If the entire rounded list from the NN matches with the known list from the test example, then add to testCorrect, else add to  testError.
-    """
+    """Get the accuracy of your Neural Network on the test examples. For each text example, you should first 
+    feedforward to get the NN outputs. Then, round the list of outputs from the output layer of the neural net. If 
+    the entire rounded list from the NN matches with the known list from the test example, then add to testCorrect, 
+    else add to  testError. """
 
     testError = 0
     testCorrect = 0
 
-    testAccuracy=0#num correct/num total
+    #TODO
+    for train, test in examplesTest:
+        nnOutputs = nnet.feedForward(train)
+        output = nnOutputs[len(nnOutputs)-1]
+        equal = True
 
-    print('Feed Forward Test correctly classified %d, incorrectly classified %d, test accuracy %f\n'%(testCorrect,testError,testAccuracy))
+        for i in range(len(output)):
+            if round(output[i]) != test[i]:
+                equal = False
+
+        if equal:
+            testCorrect += 1
+        else:
+            testError += 1
+
+    testAccuracy = float(testCorrect) / (testCorrect + testError)  # num correct/num total
+
+    print('Feed Forward Test correctly classified %d, incorrectly classified %d, test accuracy %f\n' % (
+        testCorrect, testError, testAccuracy))
 
     """return something"""
-
-
+    return nnet, testAccuracy
