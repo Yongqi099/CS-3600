@@ -21,11 +21,11 @@ def stDeviation(argList):
     return sqrt(sum(diffSq)/len(argList))
 
 penData = buildExamplesFromPenData()
-def testPenData(hiddenLayers):
+def testPenData(hiddenLayers = [24]):
     return buildNeuralNet(penData, maxItr = 200, hiddenLayerList = hiddenLayers)
 
 carData = buildExamplesFromCarData()
-def testCarData(hiddenLayers):
+def testCarData(hiddenLayers = [16]):
     return buildNeuralNet(carData, maxItr = 200,hiddenLayerList = hiddenLayers)
 
 def getAll(argList):
@@ -38,11 +38,10 @@ def testAll(num_perceptrons, iteration):
     pen_result = []
     car_result = []
     for i in range(5):
-        # pen_result.append(testPenData([num_perceptrons]))
+        pen_result.append(testPenData([num_perceptrons]))
         car_result.append(testCarData([num_perceptrons]))
 
-    # logging.info('Pen Iteration #%d - %d' % (iteration, num_perceptrons))
-    # getAll(pen_result)
+    logging.info('\nPen Iteration #%d - %d\n%s' % (iteration, num_perceptrons, getAll(pen_result)))
     logging.info('\nCar Iteration #%d - %d\n%s' % (iteration, num_perceptrons, getAll(car_result)))
 
 
