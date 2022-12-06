@@ -78,8 +78,8 @@ class Perceptron(object):
         """YOUR CODE"""
         a = self.sigmoid(value)
         b = 1 - a
-        deriv = a * b
-        return deriv
+        derivation = a * b
+        return derivation
 
     def sigmoidActivationDeriv(self, inActs):
         """
@@ -118,18 +118,15 @@ class Perceptron(object):
         totalModification = 0
         """YOUR CODE"""
         inActs.insert(0, 1.0)
-        weights = []
 
         for i, weight in enumerate(self.weights):
             newWeight = weight + (inActs[i] * alpha * delta)
-            weights.append(newWeight)
+            self.weights[i] = newWeight
 
             modification = abs(newWeight - weight)
             totalModification += modification
 
         inActs.pop(0)
-        self.weights = weights
-
         return totalModification
 
     def setRandomWeights(self):
