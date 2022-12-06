@@ -121,7 +121,7 @@ class Perceptron(object):
         weights = []
 
         for i, weight in enumerate(self.weights):
-            newWeight = weight + (alpha * inActs[i] * delta)
+            newWeight = weight + (inActs[i] * alpha * delta)
             weights.append(newWeight)
 
             modification = abs(newWeight - weight)
@@ -249,12 +249,13 @@ class NeuralNet(object):
             allLayerOutput = self.feedForward(example[0])  # """FILL IN - neural net output list computation"""
 
             lastLayerOutput = allLayerOutput[-1]
+            secondLastLayerOutput = allLayerOutput[-2]
             # Empty output layer delta list
             outDelta = []
             # iterate through all output layer neurons
             for outputNum in range(len(example[1])):
                 # TODO
-                gPrime = self.outputLayer[outputNum].sigmoidActivationDeriv((allLayerOutput[len(allLayerOutput)-2]))  # """FILL IN"""
+                gPrime = self.outputLayer[outputNum].sigmoidActivationDeriv(secondLastLayerOutput)  # """FILL IN"""
                 error = example[1][outputNum] - lastLayerOutput[outputNum]  # """FILL IN - error for this neuron"""
                 delta = gPrime * error  # """FILL IN - delta for this neuron"""
 
@@ -278,8 +279,8 @@ class NeuralNet(object):
                     intuition incorrectly """
                     # TODO
                     delta = 0.0
-                    for n in range(len(nextLayer)):
-                        delta += nextLayer[n].weights[neuronNum + 1] * deltas[0][n]
+                    for n, nextLayerNeuron in enumerate(nextLayer):
+                        delta += nextLayerNeuron.weights[neuronNum + 1] * deltas[0][n]
                     delta *= gPrime
 
                     hiddenDelta.append(delta)
@@ -336,7 +337,7 @@ def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold=0.00008, hiddenLay
     if startNNet is not None:
         hiddenLayerList = [len(layer) for layer in startNNet.hiddenLayers]
     print("Starting training at time %s with %d inputs, %d outputs, %s hidden layers, size of training set %d, "
-          "and size of test set %d"\
+          "and size of test set %d" \
           % (str(time), numIn, numOut, str(hiddenLayerList), len(examplesTrain), len(examplesTest)))
     layerList = [numIn] + hiddenLayerList + [numOut]
     nnet = NeuralNet(layerList)
@@ -352,7 +353,7 @@ def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold=0.00008, hiddenLay
     """
     Iterate for as long as it takes to reach weight modification threshold
     """
-    #TODO
+    # TODO
     while iteration < maxItr and weightMod > weightChangeThreshold:
         trainError, weightMod = nnet.backPropLearning(examplesTrain, alpha)
         iteration += 1
@@ -372,20 +373,19 @@ def buildNeuralNet(examples, alpha=0.1, weightChangeThreshold=0.00008, hiddenLay
     testError = 0
     testCorrect = 0
 
-    #TODO
+    # TODO
     for train, test in examplesTest:
         nnOutputs = nnet.feedForward(train)
-        output = nnOutputs[len(nnOutputs)-1]
+        output = nnOutputs[-1]
         equal = True
 
         for i in range(len(output)):
             if round(output[i]) != test[i]:
                 equal = False
+                testError += 1
+                break
 
-        if equal:
-            testCorrect += 1
-        else:
-            testError += 1
+        if equal: testCorrect += 1
 
     testAccuracy = float(testCorrect) / (testCorrect + testError)  # num correct/num total
 
